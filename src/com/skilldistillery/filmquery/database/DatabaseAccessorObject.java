@@ -18,7 +18,6 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		try {
 			Class.forName("com.mysql.cj.jdbc.Driver");
 		} catch (ClassNotFoundException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
@@ -31,7 +30,7 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 		PreparedStatement pstmt = null;
 		ResultSet rs;
 		Film film = null;
-		String sql = "SELECT * FROM film WHERE id = ?";
+		String sql = "SELECT * FROM film f JOIN language l ON f.language_id = l.id WHERE f.id = ?";
 		try {
 			conn = DriverManager.getConnection(URL, user, pass);
 			pstmt = conn.prepareStatement(sql);
@@ -49,12 +48,17 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 				double replacementCost = rs.getDouble("replacement_cost");
 				String rating = rs.getString("rating");
 				String specialFeatures = rs.getString("special_features");
+				List<Actor> actorList = findActorsByFilmId(filmId);
+				String language = rs.getString("name");
+
 
 				film = new Film(id, title, description, releaseYear, languageID, rentalDuration, rentalRate, length,
-						replacementCost, rating, specialFeatures);
+						replacementCost, rating, specialFeatures, actorList, language);
 			}
+			conn.close();
+			pstmt.close();
+			rs.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return film;
@@ -80,8 +84,10 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 				String lastName = rs.getString("last_name");
 				actor = new Actor(id, firstName, lastName);
 			}
+			conn.close();
+			pstmt.close();
+			rs.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return actor;
@@ -89,14 +95,15 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 
 	@Override
 	public List<Actor> findActorsByFilmId(int filmId) {
-		List<Actor> actorList = new ArrayList();
+		List<Actor> actorList = new ArrayList<Actor>();
 		String user = "student";
 		String pass = "student";
 		Connection conn = null;
 		PreparedStatement pstmt = null;
 		ResultSet rs;
 		Actor actor = null;
-		String sql = "SELECT a.first_name, a.last_name FROM actor a JOIN film_actor f JOIN film fm ON f.film_id = fm.id WHERE f.film_id = ?";
+		String sql = "SELECT a.first_name, a.last_name FROM actor a JOIN film_actor f ON a.id = f.actor_id JOIN film fm ON f.film_id = fm.id WHERE f.film_id = ?";
+		
 		try {
 			conn = DriverManager.getConnection(URL, user, pass);
 			pstmt = conn.prepareStatement(sql);
@@ -109,11 +116,58 @@ public class DatabaseAccessorObject implements DatabaseAccessor {
 				actor = new Actor(firstName, lastName);
 				actorList.add(actor);
 			}
+			conn.close();
+			pstmt.close();
+			rs.close();
 		} catch (SQLException e) {
-			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 		return actorList;
 	}
+	public List<Film> findFilmByKeyWord(String key) {
+		key = "%" + key + "%";
+		String user = "student";
+		String pass = "student";
+		Connection conn = null;
+		PreparedStatement pstmt = null;
+		ResultSet rs;
+		List<Film> filmList = new ArrayList<>();
+		Film film = null;
+		String sql = "SELECT * FROM film f JOIN language l ON f.language_id = l.id WHERE title LIKE ? OR description LIKE ?";
+		try {
+			conn = DriverManager.getConnection(URL, user, pass);
+			pstmt = conn.prepareStatement(sql);
+			pstmt.setString(1, key);
+			pstmt.setString(2, key);
+			rs = pstmt.executeQuery();
+			while(rs.next()) {
+				int id = rs.getInt("id");
+				String title = rs.getString("title");
+				String description = rs.getString("description");
+				String releaseYear = rs.getString("release_year");
+				int languageID = rs.getInt("language_id");
+				int rentalDuration = rs.getInt("rental_duration");
+				double rentalRate = rs.getDouble("rental_rate");
+				int length = rs.getInt("length");
+				double replacementCost = rs.getDouble("replacement_cost");
+				String rating = rs.getString("rating");
+				String specialFeatures = rs.getString("special_features");
+				List<Actor> actorList = new ArrayList<Actor>(findActorsByFilmId(id));
+				String language = rs.getString("name");
 
+
+				film = new Film(id, title, description, releaseYear, languageID, rentalDuration, rentalRate, length,
+						replacementCost, rating, specialFeatures, actorList, language);
+				filmList.add(film);
+				
+			}
+			conn.close();
+			pstmt.close();
+			rs.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return filmList;
+		
+	}
 }

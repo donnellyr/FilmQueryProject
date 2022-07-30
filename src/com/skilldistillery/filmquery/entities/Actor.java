@@ -55,5 +55,8 @@ public void setLastName(String lastName) {
 public String toString() {
 	return "Actor [id=" + id + ", firstName=" + firstName + ", lastName=" + lastName + "]";
 }
+public void display() {
+	System.out.println(firstName + " " + lastName);
+}
 
 }
