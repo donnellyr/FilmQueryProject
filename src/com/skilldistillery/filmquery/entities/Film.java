@@ -62,10 +62,12 @@ public Film(int id, String title, String description, String releaseYear, int la
 public void display() {
 	System.out.println("Title: " + title + " Released: " + releaseYear + " Rating: " + rating + " Language: " + language);
 	System.out.println("Description: " + description);
-	System.out.println("Cast:");
+	System.out.print("Cast: ");
 	for (Actor actor : actorList) {
 		actor.display();
 	}
+	System.out.println();
+	System.out.println();
 }
 @Override
 public String toString() {
