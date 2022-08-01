@@ -1,8 +1,6 @@
 package com.skilldistillery.filmquery.app;
-
 import java.util.List;
 import java.util.Scanner;
-
 import com.skilldistillery.filmquery.database.DatabaseAccessor;
 import com.skilldistillery.filmquery.database.DatabaseAccessorObject;
 import com.skilldistillery.filmquery.entities.Actor;
@@ -54,6 +52,7 @@ public class FilmQueryApp {
 					input.nextLine();
 					if (film != null) {
 						film.display();
+						System.out.println();
 						System.out.println("Would you like to view additional detail about the film?");
 						System.out.println("1. Yes");
 						System.out.println("2. No");
@@ -72,6 +71,7 @@ public class FilmQueryApp {
 					if (list.size() != 0) {
 						for (Film film2 : list) {
 							film2.display();
+							System.out.println();
 						}
 						System.out.println("Would you like to view additional detail about the films?");
 						System.out.println("1. Yes");
@@ -111,8 +111,9 @@ public class FilmQueryApp {
 
 		switch (choice) {
 		case 1:
-			System.out.println(film);
-			;
+			film.details();
+			break;
+		case 2: System.out.println("");
 			break;
 		}
 	}
@@ -122,9 +123,12 @@ public class FilmQueryApp {
 		switch (choice) {
 		case 1:
 			for (Film film : list) {
-				System.out.println(film);
+				film.details();
+				System.out.println();
 			}
 			break;
+		case 2: System.out.println("");
+		break;
 
 		}
 	}
